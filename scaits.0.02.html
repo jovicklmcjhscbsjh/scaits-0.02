@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scaits - Chat Moderno</title>
+    <style>
+        :root {
+            --primary-color: #1DB954;
+            --background-dark: #121212;
+            --background-medium: #1f1f1f;
+            --background-light: #2a2a2a;
+            --text-primary: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--background-dark);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .section {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .active {
+            display: flex;
+        }
+
+        .login-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1a1a1a 0%, #121212 100%);
+        }
+
+        .welcome-container {
+            background: var(--background-medium);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .app-header {
+            background: var(--background-medium);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-button {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .nav-button:hover {
+            transform: scale(1.1);
+        }
+
+        .contacts-container {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .search-bar {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.8rem 2.5rem;
+            border: none;
+            border-radius: 25px;
+            background: var(--background-light);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.7;
+        }
+
+        .contact-list {
+            list-style: none;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 15px;
+            background: var(--background-medium);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .contact-item:hover {
+            background: #252525;
+            transform: translateY(-2px);
+        }
+
+        .contact-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 1rem;
+            border: 2px solid var(--primary-color);
+            object-fit: cover;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .chat-window {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background: var(--background-dark);
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 0.8rem 1.2rem;
+            margin: 0.5rem 0;
+            border-radius: 15px;
+            animation: messageIn 0.3s ease;
+        }
+
+        @keyframes messageIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sent {
+            background: var(--primary-color);
+            margin-left: auto;
+            border-radius: 15px 15px 0 15px;
+        }
+
+        .received {
+            background: var(--background-light);
+            border-radius: 15px 15px 15px 0;
+        }
+
+        .message-input {
+            display: flex;
+            gap: 0.8rem;
+            padding: 1rem;
+            background: var(--background-medium);
+        }
+
+        .message-input input {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            border: none;
+            border-radius: 25px;
+            background: var(--background-light);
+            color: var(--text-primary);
+        }
+
+        .send-button {
+            padding: 0.8rem 1.5rem;
+            background: var(--primary-color);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .send-button:hover {
+            background: #169c46;
+        }
+
+        .profile-section {
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid var(--primary-color);
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <!-- Seção de Login -->
+    <div id="loginSection" class="section">
+        <div class="login-section">
+            <div class="welcome-container">
+                <h1>Bem-vindo ao Scaits</h1>
+                <form onsubmit="handleLogin(event)">
+                    <input type="text" id="username" placeholder="Seu nome" required>
+                    <input type="number" id="userCode" placeholder="Código (ex: 1234)" required>
+                    <button type="submit" class="send-button" style="width: 100%; margin-top: 1.5rem;">
+                        Entrar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Contatos -->
+    <div id="contactsSection" class="section">
+        <header class="app-header">
+            <button class="nav-button" onclick="showSection('loginSection')">←</button>
+            <h2>Conversas</h2>
+            <img src="https://source.unsplash.com/50x50/?avatar" class="contact-avatar" onclick="showProfile()" 
+                 style="margin-left: auto; cursor: pointer;">
+        </header>
+
+        <div class="contacts-container">
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Buscar contatos..." 
+                       oninput="filterContacts()" id="searchInput">
+                <span class="search-icon">🔍</span>
+            </div>
+            <ul class="contact-list" id="contactsList"></ul>
+        </div>
+    </div>
+
+    <!-- Seção de Chat -->
+    <div id="chatSection" class="section">
+        <header class="app-header">
+            <button class="nav-button" onclick="showSection('contactsSection')">←</button>
+            <h2 id="chatHeader">Chat</h2>
+        </header>
+        <div class="chat-window">
+            <div class="messages-container" id="messages"></div>
+            <div class="message-input">
+                <input type="text" placeholder="Digite sua mensagem..." id="messageInput">
+                <button class="send-button" onclick="sendMessage()">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Perfil -->
+    <div id="profileSection" class="section">
+        <header class="app-header">
+            <button class="nav-button" onclick="showSection('contactsSection')">←</button>
+            <h2>Perfil</h2>
+        </header>
+        <div class="profile-section">
+            <div class="profile-header">
+                <img src="https://source.unsplash.com/100x100/?person" 
+                     class="profile-pic" id="profileAvatar">
+                <div>
+                    <h2 id="profileName"></h2>
+                    <p id="profileBio" style="color: #888; margin-top: 0.5rem;"></p>
+                </div>
+            </div>
+            <button class="send-button" onclick="editProfile()" 
+                    style="width: 100%; margin-top: 1rem;">
+                Editar Perfil
+            </button>
+            <button class="send-button" onclick="logout()" 
+                    style="width: 100%; margin-top: 1rem; background: #ff4444;">
+                Sair
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let activeChat = null;
+        let contacts = [];
+
+        const sampleContacts = [
+            {
+                id: 1,
+                name: "Suporte Scaits",
+                code: 1001,
+                profilePic: "https://source.unsplash.com/50x50/?support",
+                status: "online",
+                messages: [
+                    { text: "Bem-vindo! Como podemos ajudar?", sender: 1001, timestamp: new Date().toISOString() }
+                ]
+            }
+        ];
+
+        // Controle de navegação inicial
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('currentUser');
+            
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                initializeApp();
+                showSection('contactsSection');
+            } else {
+                showSection('loginSection');
+            }
+        });
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const code = document.getElementById('userCode').value;
+
+            if (!username || !code) {
+                alert('Preencha todos os campos!');
+                return;
+            }
+
+            currentUser = {
+                id: Date.now(),
+                name: username,
+                code: code,
+                profilePic: "https://source.unsplash.com/50x50/?avatar",
+                bio: "",
+                status: "online",
+                lastLogin: new Date().toISOString()
+            };
+
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            initializeApp();
+            showSection('contactsSection');
+        }
+
+        function initializeApp() {
+            contacts = [...sampleContacts];
+            
+            if (currentUser) {
+                contacts.push({
+                    ...currentUser,
+                    messages: []
+                });
+            }
+            
+            updateContactsList();
+        }
+
+        function showSection(sectionId) {
+            ['loginSection', 'contactsSection', 'chatSection', 'profileSection'].forEach(id => {
+                document.getElementById(id)?.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        function updateContactsList(filtered = contacts) {
+            const list = document.getElementById('contactsList');
+            list.innerHTML = '';
+
+            filtered.forEach(contact => {
+                const li = document.createElement('li');
+                li.className = 'contact-item';
+                li.onclick = () => openChat(contact);
+                li.innerHTML = `
+                    <img src="${contact.profilePic}" class="contact-avatar">
+                    <div style="flex: 1;">
+                        <h3>${contact.name}</h3>
+                        <div style="display: flex; align-items: center; margin-top: 0.3rem;">
+                            <div class="status-dot" 
+                                 style="background: ${contact.status === 'online' ? '#1DB954' : '#666'}"></div>
+                            <span style="color: #888; font-size: 0.9rem;">
+                                ${contact.status === 'online' ? 'Online' : 'Offline'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        function openChat(contact) {
+            activeChat = contact;
+            document.getElementById('chatHeader').textContent = contact.name;
+            showSection('chatSection');
+            loadMessages();
+        }
+
+        function loadMessages() {
+            const container = document.getElementById('messages');
+            container.innerHTML = '';
+            
+            activeChat.messages.forEach(msg => {
+                const isSent = msg.sender === currentUser.id;
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+                messageDiv.textContent = msg.text;
+                container.appendChild(messageDiv);
+            });
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+
+            if (text && activeChat) {
+                const newMessage = {
+                    text: text,
+                    sender: currentUser.id,
+                    timestamp: new Date().toISOString()
+                };
+
+                activeChat.messages.push(newMessage);
+                input.value = '';
+                loadMessages();
+            }
+        }
+
+        function showProfile() {
+            document.getElementById('profileName').textContent = currentUser.name;
+            document.getElementById('profileBio').textContent = currentUser.bio || "Nenhuma bio disponível";
+            document.getElementById('profileAvatar').src = currentUser.profilePic;
+            showSection('profileSection');
+        }
+
+        function editProfile() {
+            const newName = prompt('Novo nome:', currentUser.name);
+            const newBio = prompt('Nova bio:', currentUser.bio);
+
+            if (newName) currentUser.name = newName;
+            if (newBio !== null) currentUser.bio = newBio;
+
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            showProfile();
+            initializeApp();
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            location.reload();
+        }
+
+        function filterContacts() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = contacts.filter(c => 
+                c.name.toLowerCase().includes(term) || 
+                c.code.toString().includes(term)
+            );
+            updateContactsList(filtered);
+        }
+    </script>
+</body>
+</html>
